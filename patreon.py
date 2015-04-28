@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import argparse
 import json
 import os
 import requests
@@ -53,8 +54,18 @@ class Patreon():
 
 
 def main():
+    ##This is pointless atm, but potentially useful as features are added.
+    parser = argparse.ArgumentParser(description='Patreon Activity Fetcher')
+    parser.add_argument('--fetch', dest='fetch', default=False, action='store_true', help='fetch report')
+
     patreon = Patreon()
-    patreon.get_data()
+
+    args = parser.parse_args()
+
+    if args.fetch:
+        patreon.get_data()
+    else: #default case
+        patreon.get_data()
 
 
 if __name__ == "__main__":
