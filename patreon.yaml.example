@@ -1,2 +1,10 @@
-email: user@gmail.com
-password: secret
+credentials:
+  email: user@gmail.com
+  password: CHANGEME
+urls:
+  login:  https://api.patreon.com/login
+  fetch_data:  https://www.patreon.com/downloadCsv?hid=
+properties:
+  dateformat:  '%Y%m%d_%H%M'
+  folder:  data
+  file:  report_data

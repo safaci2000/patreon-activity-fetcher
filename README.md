@@ -1,4 +1,7 @@
-# patreon-activity-fetcher
-Downloads Data from Patreon.  Run this as often as you need it to retrieve a snapshot of the current data set. 
+# Patreon Activity Fetcher (and Parser)
 
-#TODO:  MAKE THIS FILE USEFUL.
+## Usage instructions
+
+copy patreon.yaml.example and rename it patreon.yaml.  Update the email and password 
+fields accordingly.
+
