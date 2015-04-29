@@ -1,4 +1,4 @@
 pyyaml
-PyYAML
 requests
 argparse
+pytest

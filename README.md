@@ -6,7 +6,7 @@ pip install -r requirements.txt
 
 ## Usage instructions
 
-copy patreon.yaml.example and rename it patreon.yaml.  Update the email and password 
+copy config/patreon.yaml.example and rename it config/patreon.yaml.  Update the email and password 
 fields accordingly.
 
 to execute simply run:

@@ -1,2 +1,3 @@
-patreon.yaml
+config/patreon.yaml
+*.pyc
 .idea
