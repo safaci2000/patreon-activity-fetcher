@@ -14,6 +14,7 @@ import argparse
 import json
 import requests
 from activity_fetcher.config import Config
+from activity_fetcher.database import Database
 
 
 class Patreon():
@@ -36,21 +37,34 @@ class Patreon():
         return session
 
 
+    def process_csv_to_database(self, raw_data):
+        db_config= self.config.get_db_config(self.config.database_engine)
+        db = Database(self.config.database_engine, db_config)
+        db.load_data(raw_data)
+
     def get_data(self):
         session = self.cookie_login()
         get_data_url = self.config.url('fetch_data')
         r = session.get(get_data_url, verify=False)
         response = r.text
-        f = open(self.config.file_name, 'w')
-        f.write(response)
-        f.close()
+        if self.config.use_database:
+            self.process_csv_to_database(response)
+            print("Data has been dumped to: {db}".format(db=self.config.dbname))
+        else:
+            ## write the data out to a file.
+            f = open(self.config.file_name, 'w')
+            f.write(response)
+            f.close()
+            print("Data has been written out to: {file}".format(file=self.config.file_name))
 
 
 def main():
-    ##This is pointless atm, but potentially useful as features are added.
+    """
+    Arge parsing is a bit pointless atm, but might be useful at some point in the future.
+    :return:
+    """
     parser = argparse.ArgumentParser(description='Patreon Activity Fetcher')
     parser.add_argument('--fetch', dest='fetch', default=False, action='store_true', help='fetch report')
-
     patreon = Patreon()
 
     args = parser.parse_args()

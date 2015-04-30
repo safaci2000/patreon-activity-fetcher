@@ -1,5 +1,9 @@
 # Patreon Activity Fetcher (and Parser)
 
+##Note
+
+This app should run on python 2.x but it has been mainly developed under python 3.x. You'll probably run into less issues if you use 3.x but if there any issues with py 2.x, do let me know.
+
 ## Installation.
 
 pip install -r requirements.txt

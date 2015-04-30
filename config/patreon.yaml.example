@@ -4,7 +4,21 @@ credentials:
 urls:
   login:  https://api.patreon.com/login
   fetch_data:  https://www.patreon.com/downloadCsv?hid=
+
 properties:
   dateformat:  '%Y%m%d_%H%M'
   folder:  data
   file:  report_data
+
+##In theory we can support any backend but for now sqlite is simple
+backends:
+  database: true
+  ##Only one that is supported is sqlite atm.
+  engine: sqlite
+  postgres:
+    db_name:
+    hostname:
+    username:
+    password:
+  sqlite:
+    db_name: patreon.db

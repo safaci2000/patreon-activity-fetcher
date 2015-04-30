@@ -27,6 +27,8 @@ class Config(metaclass=Singleton):
         file = open(os.path.join(project_path, 'config/patreon.yaml'), 'r')
         self.yaml_data = yaml.load(file)
 
+        ## All Properties should be at the start of the file.
+
     @property
     def credentials(self):
         return self.yaml_data['credentials']
@@ -35,9 +37,37 @@ class Config(metaclass=Singleton):
     def credentials(self, value):
         self.yaml_data['credentials'] = value
 
+    @property
+    def use_database(self):
+        return self.yaml_data['backends']['database']
 
-    def url(self, key):
-        return self.yaml_data['urls'][key]
+    @use_database.setter
+    def use_database(self, value):
+        self.yaml_data['backends']['database'] = value
+
+    @property
+    def database_engine(self):
+        return self.yaml_data['backends']['engine']
+
+    @database_engine.setter
+    def database_engine(self, value):
+        self.yaml_data['backends']['engine'] = value
+
+    @property
+    def dbname(self):
+        return self.yaml_data['backends'][self.database_engine]['db_name']
+
+    @dbname.setter
+    def dbname(self, value):
+        self.yaml_data['backends'][self.database_engine]['db_name'] = value
+
+    @property
+    def out_folder(self):
+        return self.yaml_data['properties']['folder']
+
+    @out_folder.setter
+    def out_folder(self, value):
+        self.yaml_data['properties']['folder'] = value
 
     @property
     def file_name(self):
@@ -49,4 +79,13 @@ class Config(metaclass=Singleton):
     @property
     def date_format(self):
         return self.yaml_data['properties']['dateformat']
+
+
+    def url(self, key):
+        return self.yaml_data['urls'][key]
+
+    def get_db_config(self, engine):
+        return self.yaml_data['backends'][engine];
+
+
 
