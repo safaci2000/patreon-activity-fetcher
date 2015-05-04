@@ -62,6 +62,40 @@ class Config(metaclass=Singleton):
         self.yaml_data['backends'][self.database_engine]['db_name'] = value
 
     @property
+    def dbuser(self):
+        return self.yaml_data['backends'][self.database_engine]['username']
+
+    @dbname.setter
+    def dbuser(self, value):
+        self.yaml_data['backends'][self.database_engine]['username'] = value
+
+    @property
+    def dbpassword(self):
+        return self.yaml_data['backends'][self.database_engine]['password']
+
+    @dbname.setter
+    def dbpassword(self, value):
+        self.yaml_data['backends'][self.database_engine]['password'] = value
+
+    @property
+    def dbhostname(self):
+        return self.yaml_data['backends'][self.database_engine]['hostname']
+
+    @dbname.setter
+    def dbhostname(self, value):
+        self.yaml_data['backends'][self.database_engine]['hostname'] = value
+
+    @property
+    def dbport(self):
+        return self.yaml_data['backends'][self.database_engine]['port']
+
+    @dbname.setter
+    def dbport(self, value):
+        self.yaml_data['backends'][self.database_engine]['port'] = value
+
+
+
+    @property
     def out_folder(self):
         return self.yaml_data['properties']['folder']
 

@@ -21,10 +21,9 @@ class Patreon():
     """
       The purpose of this class is to encapsulate the Patreon API
     """
+
     def __init__(self):
         self.config = Config()
-
-
 
     def cookie_login(self):
         payload = {'data': self.config.credentials}
@@ -32,21 +31,26 @@ class Patreon():
         session = requests.Session()
         session.headers.update({'Content-type': 'application/vnd.api+json'})
         json_foo = json.dumps(payload)
-        r = session.post(url, data=json_foo, verify=False)
-        print(r.text)
+        session.post(url, data=json_foo)
         return session
 
-
     def process_csv_to_database(self, raw_data):
-        db_config= self.config.get_db_config(self.config.database_engine)
+        db_config = self.config.get_db_config(self.config.database_engine)
         db = Database(self.config.database_engine, db_config)
         db.load_data(raw_data)
 
-    def get_data(self):
-        session = self.cookie_login()
-        get_data_url = self.config.url('fetch_data')
-        r = session.get(get_data_url, verify=False)
-        response = r.text
+    def load_api_data(self, file_name=None):
+        if file_name is None:
+            session = self.cookie_login()
+            get_data_url = self.config.url('fetch_data')
+            r = session.get(get_data_url)
+            return r.text
+        else:
+            f = open(file_name, 'r')
+            return f.read()
+
+
+    def process_data(self, response):
         if self.config.use_database:
             self.process_csv_to_database(response)
             print("Data has been dumped to: {db}".format(db=self.config.dbname))
@@ -65,14 +69,24 @@ def main():
     """
     parser = argparse.ArgumentParser(description='Patreon Activity Fetcher')
     parser.add_argument('--fetch', dest='fetch', default=False, action='store_true', help='fetch report')
+    parser.add_argument('--data-file', dest='data_file', default=None, type=str,
+                        action='store', help='Skip API retrieve and treat the specified file as input instead')
     patreon = Patreon()
 
     args = parser.parse_args()
+    data = None
+    if args.data_file is not None:
+        data = patreon.load_api_data(args.data_file)
+    else:
+        data = patreon.load_api_data()
 
-    if args.fetch:
-        patreon.get_data()
-    else: #default case
-        patreon.get_data()
+
+    patreon.process_data(data)
+
+    # if args.fetch:
+    #     patreon.get_data(file_name)
+    # else:  # default case
+    #     patreon.get_data()
 
 
 if __name__ == "__main__":

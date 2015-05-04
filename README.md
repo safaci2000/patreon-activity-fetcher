@@ -31,5 +31,21 @@ Final file name will be something like:  folder/datefomrat_filename.csv
 
 ## Database
 
-Current version only supports sqlite.  It should be trivial to add support for mysql / postgres.  Keep in mind this is an alpha stage, so schema,
-datatypes and such is very likely to change. 
+###SQLite
+
+Currently, sqlite and mysql is supported.
+
+I would highly encourage using MySQL over sqlite.  sqlite implementation seems to have issue with rounding and representing decimals properly.   For now, sqlite support is left in since its requires virtually no setup.
+
+###MySQL
+
+Requirements:
+
+ - Requires InnoDB.  
+ - encoding: utf8  (You can probably get away with latin1, though this will explode if you have an international user base) 
+
+
+###Other Databases
+The engine being used is SQLAlchemy.  In theory any backend engine which SQLAlchemy [supports](http://docs.sqlalchemy.org/en/latest/dialects/index.html) can be enabled with a trivial amount of code.  Though I'm focusing primarily on MySQL at the moment. 
+
+

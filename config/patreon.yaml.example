@@ -14,11 +14,13 @@ properties:
 backends:
   database: true
   ##Only one that is supported is sqlite atm.
-  engine: sqlite
-  postgres:
-    db_name:
-    hostname:
-    username:
-    password:
+  engine: sqlite 
+  mysql:
+    db_name:  patreon
+    hostname: localhost
+    username: user
+    password: secret
+    port: 3306
+    charset: utf8
   sqlite:
     db_name: patreon.db

@@ -1,3 +1,4 @@
 config/patreon.yaml
 *.pyc
 .idea
+realdata
