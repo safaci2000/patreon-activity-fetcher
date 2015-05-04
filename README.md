@@ -29,3 +29,7 @@ file:  the file name of the report.
 
 Final file name will be something like:  folder/datefomrat_filename.csv
 
+## Database
+
+Current version only supports sqlite.  It should be trivial to add support for mysql / postgres.  Keep in mind this is an alpha stage, so schema,
+datatypes and such is very likely to change. 

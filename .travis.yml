@@ -1,0 +1,13 @@
+language: python
+
+python:
+  - "3.4"
+
+        
+install: 
+        - pip install -r requirements.txt
+         # enable example in order to be used for testing.  Might introduce a config/patreon_test.yaml or some variation for this use case. 
+        - cp config/patreon.yaml.example config/patreon.yaml  
+
+script: 
+        - py.test tests/ 
