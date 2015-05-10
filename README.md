@@ -31,9 +31,9 @@ Final file name will be something like:  folder/datefomrat_filename.csv
 
 ## Database
 
-###SQLite
-
 Currently, sqlite and mysql is supported.
+
+###SQLite
 
 I would highly encourage using MySQL over sqlite.  sqlite implementation seems to have issue with rounding and representing decimals properly.   For now, sqlite support is left in since its requires virtually no setup.
 
