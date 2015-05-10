@@ -13,5 +13,5 @@ __author__ = 'sfaci'
 import os
 
 def load_csv_file(file_path):
-    if(not os.path.exists(file_path)):
+    if not os.path.exists(file_path):
         print("oh Nooo")

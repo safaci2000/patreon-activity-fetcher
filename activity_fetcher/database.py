@@ -26,7 +26,11 @@ from sqlalchemy import *
 class Database(metaclass=Singleton):
     db_engine = None
 
-    def __init__(self, engine, db_config):
+    def __init__(self):
+        config = Config()
+        engine = config.database_engine
+        db_config = config.get_db_config(engine)
+        # db = Database(self.config.database_engine, db_config)
         self.config = Config()
         if engine == 'sqlite':
             self.init_sqlite(db_config)
@@ -61,11 +65,18 @@ class Database(metaclass=Singleton):
 
 
     def init_schema(self):
+        """
+        This method will create the table schema required for data input.
+        :return:
+        """
+
         try:
             self.db_engine.execute("select * from activity limit 1")
         except:
+            print("created new tables")
             print("activity table does not exist, initializing DB schema.")
-            self.init_schema()
+            Base.metadata.create_all(self.db_engine)
+
 
     @staticmethod
     def sanitize_numeric(value):
@@ -82,7 +93,6 @@ class Database(metaclass=Singleton):
             reward.required_pledge = match.group(0)
         else:
             reward.required_pledge = 0
-
 
         return reward
 
@@ -131,11 +141,14 @@ class Database(metaclass=Singleton):
                 continue
             if item[0].find("Reward") != -1:
                 reward = self.__generate_reward_record__(item)
-                session.add(reward)
-                session.commit()
-                reward_record = session.query(Rewards).filter_by(required_pledge=reward.required_pledge).first()
-                reward_id = reward_record.id
-
+                old_reward = session.query(Rewards).filter_by(required_pledge=reward.required_pledge).first()
+                if old_reward is None:
+                    session.add(reward)
+                    session.commit()
+                    reward_record = session.query(Rewards).filter_by(required_pledge=reward.required_pledge).first()
+                    reward_id = reward_record.id
+                else:
+                    reward_id = old_reward.id
 
                 continue
 
@@ -148,7 +161,7 @@ class Database(metaclass=Singleton):
                 session.merge(historical_record)
                 session.merge(new_record)
             elif old_record != new_record:
-                #record a new entry in the historical archives
+                # record a new entry in the historical archives
                 historical_record = HistoricalActivity(new_record)
                 session.merge(historical_record)
                 #update the values
@@ -158,14 +171,14 @@ class Database(metaclass=Singleton):
                 pass
                 # print("skipping:  item: {values} no changes".format(values=item))
 
-
         session.commit()
 
 
-    def init_schema(self):
-        """
-        This method will create the table schema required for data input.
-        :return:
-        """
-        Base.metadata.create_all(self.db_engine)
-        print("created new tables")
+    def retrieve_earnings(self):
+        earnings = {}
+        result = self.db_engine.execute("select status, sum(pledge), sum(lifetime)  from activity GROUP BY status")
+        for row in result:
+            values = row.values()
+            earnings[values[0]] = [float(values[1]), float(values[2])]
+            # earnings.append(row)
+        return earnings

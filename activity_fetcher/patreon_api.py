@@ -1,4 +1,9 @@
-#!/usr/bin/env python3
+import json
+import requests
+from activity_fetcher.config import Config
+from activity_fetcher.database import Database
+
+__author__ = 'sfaci'
 """
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -10,13 +15,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 """
-import argparse
-import json
-import requests
-from activity_fetcher.config import Config
-from activity_fetcher.database import Database
-
-
 class Patreon():
     """
       The purpose of this class is to encapsulate the Patreon API
@@ -31,12 +29,14 @@ class Patreon():
         session = requests.Session()
         session.headers.update({'Content-type': 'application/vnd.api+json'})
         json_foo = json.dumps(payload)
-        session.post(url, data=json_foo)
+        r = session.post(url, data=json_foo)
+        response  = json.loads(r.text)
+        print("Successfully logged as user_id: {id}, name: {name}".format(id=response['data']['id'], name=response['data']['full_name']))
         return session
 
-    def process_csv_to_database(self, raw_data):
-        db_config = self.config.get_db_config(self.config.database_engine)
-        db = Database(self.config.database_engine, db_config)
+    @staticmethod
+    def process_csv_to_database(raw_data):
+        db = Database()
         db.load_data(raw_data)
 
     def load_api_data(self, file_name=None):
@@ -61,34 +61,4 @@ class Patreon():
             f.close()
             print("Data has been written out to: {file}".format(file=self.config.file_name))
 
-
-def main():
-    """
-    Arge parsing is a bit pointless atm, but might be useful at some point in the future.
-    :return:
-    """
-    parser = argparse.ArgumentParser(description='Patreon Activity Fetcher')
-    parser.add_argument('--fetch', dest='fetch', default=False, action='store_true', help='fetch report')
-    parser.add_argument('--data-file', dest='data_file', default=None, type=str,
-                        action='store', help='Skip API retrieve and treat the specified file as input instead')
-    patreon = Patreon()
-
-    args = parser.parse_args()
-    data = None
-    if args.data_file is not None:
-        data = patreon.load_api_data(args.data_file)
-    else:
-        data = patreon.load_api_data()
-
-
-    patreon.process_data(data)
-
-    # if args.fetch:
-    #     patreon.get_data(file_name)
-    # else:  # default case
-    #     patreon.get_data()
-
-
-if __name__ == "__main__":
-    main()
 
