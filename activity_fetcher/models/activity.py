@@ -10,7 +10,7 @@ __author__ = 'sfaci'
  See the License for the specific language governing permissions and
  limitations under the License.
 """
-from sqlalchemy import Column, DateTime, String, Integer, Float, Index, Numeric, func, Numeric, Text
+from sqlalchemy import Column, DateTime, String, Integer, Float, Index, Numeric, func, Numeric, Text, ForeignKey
 from decimal import Decimal
 
 (12, 2)
@@ -30,7 +30,7 @@ class Activity(Base):
     shipping = Column(String(1000))
     start = Column(DateTime)  ##no idea on the format
     max_amount = Column(Numeric(12, 2))  ## or -1 if 'No Max Set' returned
-    reward = Column(Integer, default=None)
+    reward_id = Column(Integer, ForeignKey('rewards.id'),  default=None)
 
     def __eq__(self, other):
 
@@ -43,7 +43,7 @@ class Activity(Base):
                self.shipping == other.shipping and \
                self.start == other.start and \
                Decimal(self.max_amount) == Decimal(other.max_amount) and \
-               self.reward == other.reward
+               self.reward_id == other.reward_id
 
 
 
@@ -71,7 +71,7 @@ class HistoricalActivity(Base):
     start = Column(DateTime)
     max_amount = Column(Numeric(12, 2))  ## or -1 if 'No Max Set' returned
     modified_date = Column(DateTime, default=func.now())
-    reward = Column(Integer, default=None)
+    reward_id = Column(Integer, ForeignKey('rewards.id'),  default=None)
 
     def __init__(self, activity):
         super()
@@ -84,7 +84,7 @@ class HistoricalActivity(Base):
         self.shipping = activity.shipping
         self.start = activity.start
         self.max_amount = activity.max_amount
-        self.reward = activity.reward
+        self.reward_id = activity.reward_id
 
     Index('idx_email', email)
     Index('idx_modified_date', modified_date)
@@ -104,7 +104,7 @@ class Rewards(Base):
     """
     __tablename__ = 'rewards'
     id = Column('id', Integer, primary_key=True, autoincrement=True)
-    pledge = Column(Numeric(12, 2))
+    required_pledge = Column(Numeric(12, 2))
     description = Column(Text)
 
 

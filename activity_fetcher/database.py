@@ -1,9 +1,10 @@
 import os
 import io
+import re
 from sqlalchemy.orm import sessionmaker
 from activity_fetcher.config import Config
 from activity_fetcher.patterns.singelton import Singleton
-from activity_fetcher.models.activity import Activity, Base, HistoricalActivity
+from activity_fetcher.models.activity import Activity, Base, HistoricalActivity, Rewards
 from datetime import datetime as dt
 import csv
 
@@ -72,8 +73,20 @@ class Database(metaclass=Singleton):
             return value.replace(",", "")
         return value
 
+    def __generate_reward_record__(self, item):
+        reward = Rewards()
+        reward.description = item[1].replace("Description: ", "").strip()
+        match = re.search("\d+.\d{2}", item[0])
 
-    def __generate_activity_record__(self, item):
+        if match is not None:
+            reward.required_pledge = match.group(0)
+        else:
+            reward.required_pledge = 0
+
+
+        return reward
+
+    def __generate_activity_record__(self, item, min_reward):
         activity = Activity()
         activity.name = item[0]
         activity.email = item[1]
@@ -93,6 +106,7 @@ class Database(metaclass=Singleton):
         if item[8] == 'No Max Set':
             item[8] = '-1';
         activity.max_amount = self.sanitize_numeric(item[8])
+        activity.reward_id = min_reward
 
         return activity
 
@@ -107,16 +121,25 @@ class Database(metaclass=Singleton):
         count = 0
         Session = sessionmaker(bind=self.db_engine, autoflush=False)
         session = Session()
+        reward_id = None
         for item in data:
             ##skip headers
             if count == 0:
                 count += 1
                 continue
+            if len(item) == 0:
+                continue
             if item[0].find("Reward") != -1:
-                # TODO: process reward here.
+                reward = self.__generate_reward_record__(item)
+                session.add(reward)
+                session.commit()
+                reward_record = session.query(Rewards).filter_by(required_pledge=reward.required_pledge).first()
+                reward_id = reward_record.id
+
+
                 continue
 
-            new_record = self.__generate_activity_record__(item)
+            new_record = self.__generate_activity_record__(item, reward_id)
 
             old_record = session.query(Activity).filter_by(email=new_record.email).first()
 
